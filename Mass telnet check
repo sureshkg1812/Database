@@ -1,0 +1,41 @@
+#!/bin/sh
+# Script to run telnet checks on more than one IP automatically
+# Input file format: CSV
+# Input file contents: IP address, Service Port separated by delimiter (comma)
+
+# Set you Delimiter value here
+# If the input file has delimited with spaces, comment this line
+IFS=","
+
+# Get hostname of system executing checks
+hst=`hostname`
+
+while read ip port
+do
+        nc -z -v -w2 $ip $port
+        result=$?
+
+        if [ "$result" != 0 ]; then
+                echo "$ip,$port,failed"
+        else
+                echo "$ip,$port,connected"
+        fi
+
+# Output to file connstatus.log
+done < connchk > connstatus.log
+
+# Check if email is required
+read -p "Do you need an email with the results?? Enter 'y' if required: " rdinpt
+
+if [ $rdinpt = "y" ]; then
+    read -p "Enter email Id: " mailid
+
+    # Email results
+    echo "Telet connection results enclosed" | mailx -s "Telnet Connection Checks executed on ${hst}" -a connstatus.log ${mailid}
+    echo "Email sent! Please check your inbox! Have a great day!"
+
+else
+
+    exit 0
+
+fi
