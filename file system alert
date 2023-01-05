@@ -1,0 +1,19 @@
+#!/bin/sh
+# Script to get the files created during the file system high alert
+dt=`date +%m%d%Y%H%M%S`
+dtf=`date +%d%b%Y`
+mlsnd="/usr/sap/scripts/logs/filesystemalert_"$dt".log"
+exec &> $mlsnd
+
+sid="SID"
+fs=`df -hT | grep iface | awk '{ print $7 }'`
+fsutl=`df -hT | grep iface | awk '{ print $6 }' | cut -d% -f1`
+if [[ $fsutl -gt 85 ]]; then
+    echo -e "Running out of space for ${sid^^} on ${fs} with current utilization at ${fsutl}\n" > ${mlsnd}
+    echo -e "The files modified in the last 5mins are enclosed below:\n" >> ${mlsnd}
+    find ${fs} -mmin -5 -print 1>>${mlsnd} 2>>${mlsnd}
+fi
+
+# Email the log file
+mailx -s "${sid^^}: File system Alert" eamil, RASS_SWT_BASIS@daimler.com < ${mlsnd}
+
