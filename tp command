@@ -1,0 +1,2 @@
+tp addtobuffer TR# SID pf=TP_DOMAIN_SID.PFL
+tp import TR# SID client=*** U18 pf=TP_DOMAIN_SID.PFL
