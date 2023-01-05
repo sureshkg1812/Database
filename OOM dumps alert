@@ -1,0 +1,20 @@
+#!/bin/sh
+# Script to check if any memory dump file produced in system
+
+WORKDIR=/usr/sap/scripts/email_dump_check
+MAIL2SEND=/usr/sap/scripts/email_dump_check
+echo > /usr/sap/scripts/email_dump_check
+ONE=1
+dataset_date=`date`
+TODAY=`date -d "$dataset_date - $ONE days" +%d-%b-%G`
+
+ls -ltr /usr/sap/PX1/J01/j2ee/cluster/server0/*.hprof  > /dev/null 2>&1
+if [ `echo $?` -eq 0 ]
+then
+
+mv /usr/sap/PX1/J01/j2ee/cluster/server0/*.hprof /hana/data/OOM_dump/ >> ${MAIL2SEND}
+mailx -s "Java Heap Memory dump found in PX1 Dump file has been moved to /hana/data/OOM_dump location - Kindly check :(`date`)" dwa_128-itt-fo_sap_npm-editor@daimler.com, dw_623-infosys_taf-p-sap-w4c18@daimler.com, RASS_SWT_BASIS@daimler.com, dw_623-mbrdi-proj_swt-pi-team@daimler.com < ${MAIL2SEND}
+
+else
+ exit 5
+fi
