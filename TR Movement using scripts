@@ -1,0 +1,27 @@
+#!/bin/ksh
+#*********************#
+#Date   : ****
+#Purpose: Mass transport processing.
+#Param  : SID=*** Client=**
+#Note   : Script reads transport no.
+#         from mytpreq.txt file.
+#*********************#
+echo
+read ans?"Do you want to proceed to MASS TRANSPORT records in mytpreqSID.txt? (Y/N) "
+ case $ans in
+  y|Y)echo ""; date | tee -a mass_tp_SID.log
+     while read tpno; do
+        echo =========== start of tp ================== | tee -a mass_tp_SID.log
+        echo ADDING TO BUFFER FOR $tpno ... | tee -a mass_tp_SID.log
+        tp addtobuffer $tpno SID client=*** pf=TP_DOMAIN_SID.PFL | tee -a mass_tp_SID.log
+         sleep 5; echo adding to buffer... | tee -a mass_tp_SID.log; echo | tee -a mass_tp_SID.log
+          echo Importing $tpno to SID... | tee -a mass_tp_SID.log
+          tp import $tpno SID client=*** pf=TP_DOMAIN_SID.PFL U0128 | tee -a mass_tp_SID.log
+        echo =========== end of tp ================== | tee -a mass_tp_SID.log
+     done < mytpreqSID.txt
+     date | tee -a mass_tp_SID.log
+     ;;
+  n|N) echo "";echo "Nothing done ..."
+     sleep 1; exit
+     ;;
+ esac
