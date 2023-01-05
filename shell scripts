@@ -1,0 +1,18 @@
+#!/bin/sh
+# Script to check if any memory dump file produced in system
+
+dataset_date=`date`
+TODAY=`date -d "$dataset_date - $ONE days" +%d-%b-%G`
+
+
+sapcontrol -nr 55 -function GetProcessList > sapstatus.txt
+
+sleep 10  # Waits 10 seconds
+
+sapcontrol -nr 55 -function GetSystemInstanceList >> sapstatus.txt
+
+sleep 10  # Waits 10 seconds
+
+
+mailx -s "SAP System - Availability checks : (`date`)" -a sapstatus.txt suresh.ganapathy@mercedes-benz.com, RASS_SWT_BASIS@daimler.com  < sapstatus.txt
+
